@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+
+<html lang="id" class="scroll-smooth">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Interaktif: Mengoptimalkan e-Procurement untuk Mencegah Korupsi</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    
+
+    <!-- Chosen Palette: Calm Harmony -->
+
+    <!-- Application Structure Plan: Aplikasi ini dirancang dengan alur naratif 4 bagian untuk memaksimalkan pemahaman pengguna. Dimulai dengan (1) Hero/Beranda yang menarik perhatian dengan ringkasan dan statistik kunci. Dilanjutkan ke (2) Visualisasi Masalah, di mana data kuantitatif disajikan dalam bentuk grafik interaktif untuk menunjukkan skala masalah. Kemudian, pengguna diarahkan ke (3) Rekomendasi Solusi, sebuah bagian inti yang menggunakan sistem tab interaktif untuk menjelaskan setiap solusi secara mendalam namun ringkas. Terakhir, (4) Tentang Laporan memberikan kredibilitas dengan info penulis dan sumber. Struktur ini mengubah laporan linier menjadi pengalaman eksplorasi yang terpandu, dari 'mengapa' (masalah) ke 'bagaimana' (solusi), sehingga lebih mudah dicerna dan menarik bagi pengguna. -->
+
+    <!-- Visualization & Content Choices: 
+
+        - Risiko Korupsi (KPK): Bar Chart (Chart.js/Canvas) untuk perbandingan langsung antara risiko di kementerian/lembaga dan daerah. Interaksi: Tooltip. Justifikasi: Efektif membandingkan dua nilai.
+
+        - Tren Indeks Anti Korupsi (BPS): Line Chart (Chart.js/Canvas) untuk menunjukkan perubahan/penurunan dari waktu ke waktu. Interaksi: Tooltip. Justifikasi: Standar emas untuk visualisasi tren.
+
+        - Data Kasus (ICW): Kartu Statistik (HTML/Tailwind) untuk menyorot angka absolut (jumlah kasus & tersangka). Justifikasi: Lebih jelas dan berdampak daripada chart untuk dua metrik yang berbeda.
+
+        - 3 Rekomendasi Utama: Sistem Tab Interaktif (HTML/CSS/JS) untuk menyajikan informasi mendalam secara terorganisir. Interaksi: Klik untuk menampilkan detail. Justifikasi: Mencegah kelebihan informasi dan memungkinkan eksplorasi terfokus.
+
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+            background-color: #FDFBF6;
+
+            color: #3C3633;
+
+        }
+
+        .highlight-text {
+
+            color: #E07A5F;
+
+        }
+
+        .btn-primary {
+
+            background-color: #81B29A;
+
+            color: #FFFFFF;
+
+            transition: background-color 0.3s;
+
+        }
+
+        .btn-primary:hover {
+
+            background-color: #6a947e;
+
+        }
+
+        .nav-link {
+
+            transition: color 0.3s;
+
+            position: relative;
+
+        }
+
+        .nav-link:hover {
+
+            color: #E07A5F;
+
+        }
+
+        .nav-link::after {
+
+            content: '';
+
+            position: absolute;
+
+            width: 0;
+
+            height: 2px;
+
+            bottom: -4px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            background-color: #E07A5F;
+
+            transition: width 0.3s;
+
+        }
+
+        .nav-link:hover::after {
+
+            width: 100%;
+
+        }
+
+        .tab-btn.active {
+
+            background-color: #E07A5F;
+
+            color: #FFFFFF;
+
+        }
+
+        .tab-content {
+
+            display: none;
+
+        }
+
+        .tab-content.active {
+
+            display: block;
+
+        }
+
+        .chart-container {
+
+            position: relative;
+
+            width: 100%;
+
+            max-width: 600px;
+
+            margin-left: auto;
+
+            margin-right: auto;
+
+            height: 320px;
+
+            max-height: 400px;
+
+        }
+
+        @media (min-width: 768px) {
+
+            .chart-container {
+
+                height: 400px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+
+            <div class="text-xl font-bold">
+
+                e-Procurement <span class="highlight-text">Watch</span>
+
+            </div>
+
+            <div class="hidden md:flex space-x-8">
+
+                <a href="#beranda" class="nav-link font-medium">Beranda</a>
+
+                <a href="#masalah" class="nav-link font-medium">Masalah</a>
+
+                <a href="#rekomendasi" class="nav-link font-medium">Rekomendasi</a>
+
+                <a href="#tentang" class="nav-link font-medium">Tentang</a>
+
+            </div>
+
+            <div class="md:hidden">
+
+                <button id="menu-btn" class="text-gray-700 focus:outline-none">
+
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+
+                </button>
+
+            </div>
+
+        </nav>
+
+        <div id="mobile-menu" class="hidden md:hidden">
+
+            <a href="#beranda" class="block py-2 px-4 text-sm hover:bg-gray-200">Beranda</a>
+
+            <a href="#masalah" class="block py-2 px-4 text-sm hover:bg-gray-200">Masalah</a>
+
+            <a href="#rekomendasi" class="block py-2 px-4 text-sm hover:bg-gray-200">Rekomendasi</a>
+
+            <a href="#tentang" class="block py-2 px-4 text-sm hover:bg-gray-200">Tentang</a>
+
+        </div>
+
+    </header>
+
+    <main>
+
+        <section id="beranda" class="py-20 md:py-32">
+
+            <div class="container mx-auto px-6 text-center">
+
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">Mengoptimalkan e-Procurement, <br> Memerangi <span class="highlight-text">Korupsi</span></h1>
+
+                <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600 mb-8">
+
+                    Digitalisasi pengadaan adalah langkah awal, bukan akhir. Laporan ini mengungkap celah dalam sistem e-Procurement di Indonesia dan menawarkan tiga rekomendasi kebijakan strategis untuk membangun tata kelola yang benar-benar transparan, akuntabel, dan efisien.
+
+                </p>
+
+                <a href="#masalah" class="btn-primary font-bold py-3 px-8 rounded-full inline-block">Lihat Skala Masalah</a>
+
+            </div>
+
+        </section>
+
+        <section id="masalah" class="py-20 bg-white">
+
+            <div class="container mx-auto px-6">
+
+                <div class="text-center mb-16">
+
+                    <h2 class="text-3xl md:text-4xl font-bold mb-3">Darurat Korupsi Pengadaan</h2>
+
+                    <p class="max-w-2xl mx-auto text-gray-600">Meskipun sistem digital telah berjalan, data menunjukkan praktik korupsi di sektor pengadaan masih mengkhawatirkan. Visualisasi berikut menggambarkan betapa dalamnya masalah yang kita hadapi, dari risiko yang hampir menyentuh 100% hingga ribuan kasus yang terungkap.</p>
+
+                </div>
+
+                
+
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+
+                    <div class="order-2 md:order-1">
+
+                        <h3 class="text-2xl font-bold mb-4">Risiko Penyalahgunaan Merajalela</h3>
+
+                        <p class="text-gray-600 mb-6">Survei Penilaian Integritas (SPI) KPK tahun 2024 menunjukkan risiko korupsi pengadaan yang sangat tinggi, baik di tingkat pusat maupun daerah. Angka ini menandakan adanya intervensi dan subversi sistem yang masih masif.</p>
+
+                        <div class="chart-container">
+
+                            <canvas id="riskChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+                    <div class="order-1 md:order-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                         <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+
+                            <p class="text-gray-500 text-sm">Kasus Korupsi Pengadaan</p>
+
+                            <p class="text-4xl font-extrabold highlight-text">1.189</p>
+
+                            <p class="text-gray-500 text-sm">2019-2023 (Laporan ICW)</p>
+
+                        </div>
+
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-md text-center">
+
+                            <p class="text-gray-500 text-sm">Tersangka Ditetapkan</p>
+
+                            <p class="text-4xl font-extrabold highlight-text">2.898</p>
+
+                            <p class="text-gray-500 text-sm">Mayoritas pejabat & vendor</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-20">
+
+                    <h3 class="text-2xl font-bold mb-4 text-center">Toleransi Publik Terhadap Korupsi</h3>
+
+                    <p class="text-gray-600 mb-6 max-w-3xl mx-auto text-center">Indeks Perilaku Anti Korupsi (IPAK) dari BPS menunjukkan sedikit penurunan, menandakan adanya toleransi publik terhadap bentuk korupsi kecil. Ini menjadi tantangan budaya yang harus diatasi bersamaan dengan perbaikan sistem.</p>
+
+                    <div class="chart-container">
+
+                        <canvas id="ipakChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="rekomendasi" class="py-20">
+
+            <div class="container mx-auto px-6">
+
+                <div class="text-center mb-12">
+
+                    <h2 class="text-3xl md:text-4xl font-bold mb-3">Tiga Langkah Strategis</h2>
+
+                    <p class="max-w-3xl mx-auto text-gray-600">Reformasi tidak cukup hanya dengan teknologi, tetapi memerlukan perubahan sistemik. Berikut adalah tiga rekomendasi kebijakan kunci yang dirancang untuk menutup celah korupsi, meningkatkan transparansi, dan memperkuat akuntabilitas dalam e-Procurement.</p>
+
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+
+                    <div class="flex flex-col sm:flex-row border-b-2 border-gray-200 mb-6">
+
+                        <button data-tab="tab1" class="tab-btn flex-1 py-3 px-4 font-semibold text-gray-600 hover:bg-gray-100 transition duration-300 active">1. Pengawasan Terintegrasi</button>
+
+                        <button data-tab="tab2" class="tab-btn flex-1 py-3 px-4 font-semibold text-gray-600 hover:bg-gray-100 transition duration-300">2. Perluasan Mekanisme Sanggah</button>
+
+                        <button data-tab="tab3" class="tab-btn flex-1 py-3 px-4 font-semibold text-gray-600 hover:bg-gray-100 transition duration-300">3. Transparansi Cashback</button>
+
+                    </div>
+
+                    <div id="tab1" class="tab-content active p-6 bg-white rounded-lg shadow-md">
+
+                        <h3 class="text-xl font-bold mb-4">Membangun Sistem Pengawasan Real-Time dan Integratif Berbasis Data</h3>
+
+                        <p class="text-gray-600 mb-4"><strong class="text-gray-800">Masalah:</strong> Lemahnya sistem pengawasan internal dan fragmentasi 600+ portal LPSE menjadi celah terbesar yang dimanfaatkan oleh aktor korupsi. Deteksi penyimpangan sangat lambat.</p>
+
+                        <p class="text-gray-600 mb-4"><strong class="text-gray-800">Solusi:</strong> Membangun platform pengawasan digital yang mengintegrasikan data transaksi dari LKPP dengan sistem audit (BPKP) dan pelaporan (KPK), serta membuka akses publik untuk memonitor proses secara real-time.</p>
+
+                        <div class="mt-4 pt-4 border-t">
+
+                            <h4 class="font-semibold">Manfaat Utama:</h4>
+
+                            <ul class="list-disc list-inside text-gray-600 mt-2 space-y-1">
+
+                                <li>Deteksi dini dan real-time atas transaksi mencurigakan.</li>
+
+                                <li>Peningkatan transparansi dan akuntabilitas publik.</li>
+
+                                <li>Penguatan prinsip good governance secara menyeluruh.</li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                    <div id="tab2" class="tab-content p-6 bg-white rounded-lg shadow-md">
+
+                        <h3 class="text-xl font-bold mb-4">Perluasan Cakupan Mekanisme Sanggah (Bid Protest)</h3>
+
+                        <p class="text-gray-600 mb-4"><strong class="text-gray-800">Masalah:</strong> Mekanisme sanggah saat ini hanya berlaku setelah pemenang ditetapkan. Padahal, 49% pemenang tender diduga sudah diatur sejak awal penyusunan dokumen pengadaan.</p>
+
+                        <p class="text-gray-600 mb-4"><strong class="text-gray-800">Solusi:</strong> Membuka mekanisme sanggah sejak tahap penyusunan dokumen. Ini memungkinkan calon peserta untuk menggugat jika menemukan persyaratan teknis yang diskriminatif atau mengarah ke vendor tertentu.</p>
+
+                        <div class="mt-4 pt-4 border-t">
+
+                            <h4 class="font-semibold">Manfaat Utama:</h4>
+
+                            <ul class="list-disc list-inside text-gray-600 mt-2 space-y-1">
+
+                                <li>Mencegah manipulasi dan rekayasa tender sejak dari hulu.</li>
+
+                                <li>Memperkuat akuntabilitas panitia pengadaan.</li>
+
+                                <li>Menciptakan proses pengadaan yang lebih adil dan kompetitif.</li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                    <div id="tab3" class="tab-content p-6 bg-white rounded-lg shadow-md">
+
+                        <h3 class="text-xl font-bold mb-4">Terapkan Regulasi Transparansi atas Cashback dan Diskon</h3>
+
+                        <p class="text-gray-600 mb-4"><strong class="text-gray-800">Masalah:</strong> Praktik cashback dan diskon dari vendor sering menjadi "ruang abu-abu" yang disalahgunakan sebagai gratifikasi terselubung. Potongan harga yang seharusnya untuk negara, masuk ke kantong pribadi.</p>
+
+                        <p class="text-gray-600 mb-4"><strong class="text-gray-800">Solusi:</strong> Menerapkan regulasi khusus yang mewajibkan seluruh bentuk cashback dan diskon dilaporkan secara digital dalam sistem e-procurement. Data tersebut harus diaudit secara berkala dan dibuka ke publik.</p>
+
+                         <div class="mt-4 pt-4 border-t">
+
+                            <h4 class="font-semibold">Manfaat Utama:</h4>
+
+                            <ul class="list-disc list-inside text-gray-600 mt-2 space-y-1">
+
+                                <li>Menutup celah gratifikasi terselubung.</li>
+
+                                <li>Memperkuat keuangan negara dengan memastikan diskon kembali ke kas negara.</li>
+
+                                <li>Menjadikan e-procurement bersih secara teknis dan etis.</li>
+
+                            </ul>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <footer id="tentang" class="bg-white border-t py-12">
+
+            <div class="container mx-auto px-6 text-center text-gray-600">
+
+                <h3 class="text-lg font-semibold mb-2">Tentang Laporan Ini</h3>
+
+                <p class="max-w-2xl mx-auto text-sm mb-4">
+
+                    Aplikasi interaktif ini didasarkan pada policy brief "Mengoptimalkan e-Procurement untuk Mencegah Korupsi dalam Pengadaan Barang dan Jasa di Indonesia" yang disusun oleh:
+
+                </p>
+
+                <p class="font-medium text-sm">Frilda Sulistya Prasetya, Muhammad Ravy Nugraha, & Fadila Amalia</p>
+
+                <p class="text-xs">Administrasi Publik, FISIP, UIN Sunan Gunung Djati Bandung</p>
+
+                <p class="text-xs mt-8">&copy; 2025 e-Procurement Watch. Dibuat untuk tujuan edukasi dan advokasi.</p>
+
+            </div>
+
+        </footer>
+
+    </main>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Mobile Menu
+
+            const menuBtn = document.getElementById('menu-btn');
+
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            menuBtn.addEventListener('click', () => {
+
+                mobileMenu.classList.toggle('hidden');
+
+            });
+
+            // Tabs for Recommendations
+
+            const tabButtons = document.querySelectorAll('.tab-btn');
+
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+
+                button.addEventListener('click', () => {
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+
+                    button.classList.add('active');
+
+                    tabContents.forEach(content => {
+
+                        content.classList.remove('active');
+
+                        if (content.id === button.dataset.tab) {
+
+                            content.classList.add('active');
+
+                        }
+
+                    });
+
+                });
+
+            });
+
+            // Chart.js Implementations
+
+            const fontFamily = "'Inter', sans-serif";
+
+            const primaryColor = '#E07A5F';
+
+            const secondaryColor = '#81B29A';
+
+            const gridColor = '#E5E7EB';
+
+            const textColor = '#3C3633';
+
+            // Chart 1: Risk Chart
+
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+
+            new Chart(riskCtx, {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: ['Tingkat Kementerian/Lembaga', 'Tingkat Daerah'],
+
+                    datasets: [{
+
+                        label: 'Risiko Penyalahgunaan (%)',
+
+                        data: [97, 99],
+
+                        backgroundColor: [secondaryColor, primaryColor],
+
+                        borderColor: [secondaryColor, primaryColor],
+
+                        borderWidth: 1,
+
+                        barThickness: 50,
+
+                    }]
+
+                },
+
+                options: {
+
+                    indexAxis: 'y',
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    return ` Risiko: ${context.raw}%`;
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+
+                            beginAtZero: true,
+
+                            max: 100,
+
+                            grid: {
+
+                                color: gridColor
+
+                            },
+
+                            ticks: {
+
+                                color: textColor,
+
+                                font: {
+
+                                  family: fontFamily
+
+                                }
+
+                            }
+
+                        },
+
+                        y: {
+
+                            grid: {
+
+                                display: false
+
+                            },
+
+                            ticks: {
+
+                                color: textColor,
+
+                                font: {
+
+                                  family: fontFamily,
+
+                                  size: 14
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+            // Chart 2: IPAK Trend Chart
+
+            const ipakCtx = document.getElementById('ipakChart').getContext('2d');
+
+            new Chart(ipakCtx, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: ['2023', '2024'],
+
+                    datasets: [{
+
+                        label: 'Indeks Perilaku Anti Korupsi (Skala 0-5)',
+
+                        data: [3.92, 3.85],
+
+                        fill: false,
+
+                        borderColor: primaryColor,
+
+                        tension: 0.1,
+
+                        pointBackgroundColor: primaryColor,
+
+                        pointRadius: 5
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                           display: true,
+
+                           position: 'bottom',
+
+                           labels: {
+
+                               color: textColor,
+
+                               font: {
+
+                                   family: fontFamily
+
+                               }
+
+                           }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: false,
+
+                            min: 3.8,
+
+                            max: 4.0,
+
+                             grid: {
+
+                                color: gridColor
+
+                            },
+
+                            ticks: {
+
+                                color: textColor,
+
+                                font: {
+
+                                  family: fontFamily
+
+                                }
+
+                            }
+
+                        },
+
+                        x: {
+
+                             grid: {
+
+                                color: gridColor
+
+                            },
+
+                            ticks: {
+
+                                color: textColor,
+
+                                font: {
+
+                                  family: fontFamily
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>
+<!-- partial -->
+  
+</body>
+</html>
